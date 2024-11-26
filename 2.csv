@@ -1,0 +1,113 @@
+using System;
+using System.Collections.Generic;
+
+namespace OnlineStore
+{
+    public class Product
+    {
+        public int ID { get; set; }
+        public string Name { get; set; }
+        public decimal Price { get; set; }
+    }
+
+    public class Cart
+    {
+        public List<Product> Products { get; private set; } = new List<Product>();
+
+        public void AddProduct(Product product)
+        {
+            Products.Add(product);
+            Console.WriteLine($"Товар '{product.Name}' добавлен в корзину.");
+        }
+
+        public void RemoveProduct(Product product)
+        {
+            Products.Remove(product);
+            Console.WriteLine($"Товар '{product.Name}' удален из корзины.");
+        }
+
+        public decimal CalculateTotal()
+        {
+            decimal total = 0;
+            foreach (var product in Products)
+            {
+                total += product.Price;
+            }
+            return total;
+        }
+    }
+
+    public class Order
+    {
+        public int ID { get; set; }
+        public Cart Cart { get; set; }
+        public string CustomerName { get; set; }
+        public string Address { get; set; }
+        public string Status { get; private set; } = "Pending";
+
+        public void ConfirmOrder()
+        {
+            Status = "Confirmed";
+            Console.WriteLine("Заказ подтвержден.");
+        }
+
+        public void CancelOrder()
+        {
+            Status = "Cancelled";
+            Console.WriteLine("Заказ отменен.");
+        }
+    }
+
+    public class PaymentProcessor
+    {
+        public bool ProcessPayment(decimal amount)
+        {
+            Console.WriteLine($"Обработка платежа на сумму {amount}...");
+            return true;
+        }
+    }
+
+    public class OrderProcessor
+    {
+        public void ProcessOrder(Order order)
+        {
+            Console.WriteLine($"Обработка заказа ID: {order.ID}...");
+            Console.WriteLine("Заказ отправлен на склад и в доставку.");
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var product1 = new Product { ID = 1, Name = "Ноутбук", Price = 150000 };
+            var product2 = new Product { ID = 2, Name = "Смартфон", Price = 80000 };
+
+            var cart = new Cart();
+            cart.AddProduct(product1);
+            cart.AddProduct(product2);
+
+            Console.WriteLine($"Общая стоимость товаров в корзине: {cart.CalculateTotal()}");
+
+            var order = new Order
+            {
+                ID = 1,
+                Cart = cart,
+                CustomerName = "Иван Иванов",
+                Address = "г. Алматы, ул. Абая, д.10"
+            };
+
+            var paymentProcessor = new PaymentProcessor();
+            if (paymentProcessor.ProcessPayment(cart.CalculateTotal()))
+            {
+                order.ConfirmOrder();
+                var orderProcessor = new OrderProcessor();
+                orderProcessor.ProcessOrder(order);
+            }
+            else
+            {
+                order.CancelOrder();
+            }
+        }
+    }
+}
